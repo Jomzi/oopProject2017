@@ -117,31 +117,41 @@ class ClientServiceThread extends Thread {
 					String filePath = (String) in.readObject();
 					System.out.println("File: " + filePath);
 					filePath = currentDirectory + "\\" + filePath;
+					System.out.println("File requested: " + filePath);
+					
 					File downloadFile = new File(filePath);
-					long size;
+					
 					if(downloadFile.exists()){
-						size = downloadFile.length();
-						downloadFile.length();
-						System.out.println("Output file size... " + size);
-						out.writeLong(size);
-						out.flush();
+						
+						System.out.println("Output file size... " + downloadFile.length());
+												
+						int size = (int)downloadFile.length();
+						
+						byte [] fileBytes = new byte[size];
+						
+						try {
+							
+							FileInputStream inputStream = new FileInputStream(downloadFile);
+							inputStream.read(fileBytes);
+							inputStream.close();
+							
+							out.writeInt(size);	
+							out.flush();
+							
+							DataOutputStream dos = new DataOutputStream(out);
+							
+							System.out.println("Sending " + size + " bytes.");
+							dos.write(fileBytes, 0, size);
+							dos.flush();
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
 					}
 					else{
 						System.out.println("File doesn't exists!");
 					}
-					Path file = Paths.get(filePath);
-					try (SeekableByteChannel sbc = Files.newByteChannel(file)) {
-					    ByteBuffer buf = ByteBuffer.allocate(100);
-					    while (sbc.read(buf) > 0) {
-					    	System.out.println("Sending... "+ buf.array().length);
-					    	buf.rewind();
-					    	out.write(buf.array());
-					    	
-					    }
-					
-					
-				}
-				
 				}
 			}
 			catch(IOException io){
