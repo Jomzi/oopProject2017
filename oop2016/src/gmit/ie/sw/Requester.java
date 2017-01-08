@@ -100,15 +100,13 @@ public class Requester{
 			out.writeObject(pathName);
 			out.flush();
 			
-			Long downloadFileSize  = in.readLong();
-			System.out.println("Size =  " + downloadFileSize);
-			long totalByte = 0;
-			byte[] buf = new byte[100];
-			while(totalByte <= downloadFileSize){
-				
-				int bytes = in.read(buf);
-				System.out.println("Read bytes..." + bytes);
-			}
+			int size  = in.readInt();
+			System.out.println("Size =  " + size);
+			
+			byte[] buf = new byte[size];
+			DataInputStream dis = new DataInputStream(in);
+			dis.readFully(buf, 0, size);
+			System.out.println("Read " + buf.length + " bytes...");
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
